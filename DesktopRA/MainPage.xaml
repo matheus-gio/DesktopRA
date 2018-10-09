@@ -46,7 +46,7 @@
             </ScrollViewer>
         </Grid>
         
-        <Canvas x:Name="canvas" Background="Black" Grid.Row="0" Grid.RowSpan="9" Grid.Column="4" Grid.ColumnSpan="6" Margin="0 30 10 30">
+        <Canvas x:Name="canvas" Background="Black" Grid.Row="0" Grid.RowSpan="9" Grid.Column="4" Grid.ColumnSpan="6" Margin="0 30 10 30" PointerMoved="canvas_PointerMoved" PointerPressed="canvas_PointerPressed" PreviewKeyDown="canvas_PreviewKeyDown" KeyDown="canvas_KeyDown">
             <Image x:Name="mapa_ra" Grid.ColumnSpan="10" Grid.Column="0" HorizontalAlignment="Left" Height="100" Margin="0,0,0,0" Grid.Row="0" Grid.RowSpan="10"/>
             <Grid x:Name="GridFullScreen" Height="100" Canvas.Left="0">
                 <Slider Visibility="Collapsed" Width="100" Margin="0,75,580,0" x:Name="f_SizeSlider" Foreground="#FF3141A8" BorderBrush="{x:Null}" Background="#FF3141A8" Maximum="100" Minimum="10" TickFrequency="5" Value="3"  ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Grid.ColumnSpan="2"/>
@@ -56,11 +56,11 @@
             </Grid>
 
             <Canvas.ContextFlyout>
-                <MenuFlyout>
-                    <MenuFlyoutItem Text="Linha"/>
-                    <MenuFlyoutItem Text="Circulo"/>
-                    <MenuFlyoutItem Text="Quadrado"/>
-                    <MenuFlyoutItem Text="Retangulo"/>
+                <MenuFlyout Opened="MenuFlyout_Opened" Closed="MenuFlyout_Closed" Opening="MenuFlyout_Opening">
+                    <MenuFlyoutItem Text="Linha" Click="MenuFlyoutItem_Click_1"/>
+                    <MenuFlyoutItem Text="Circulo" Click="MenuFlyoutItem_Click_4"/>
+                    <MenuFlyoutItem Text="Quadrado" Click="MenuFlyoutItem_Click_2"/>
+                    <MenuFlyoutItem Text="Retangulo" Click="MenuFlyoutItem_Click_3"/>
                     <MenuFlyoutItem Text="FullScreen" Click="MenuFlyoutItem_Click"/>
                     <MenuFlyoutItem Text="Salvar Imagem"/>
                 </MenuFlyout>
