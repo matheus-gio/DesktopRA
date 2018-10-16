@@ -129,15 +129,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.7</Version>
+      <Version>6.1.9</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="RALIBRARY">
-      <HintPath>..\..\..\..\RALIBRARY\RALIBRARY\RALIBRARY\bin\Debug\RALIBRARY.dll</HintPath>
+    <Reference Include="RALIBRARY, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\RALIBRARY\RALIBRARY\RALIBRARY\bin\x86\Debug\RALIBRARY.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

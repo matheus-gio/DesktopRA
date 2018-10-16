@@ -13,7 +13,9 @@ using System.Text;
 using System.Threading;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -21,6 +23,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 
@@ -35,11 +38,11 @@ namespace DesktopRA
     {
 
         Boolean fullscreen = false; double canvas_heig,canvas_wid;
-        List<Product> produtos = new List<Product>();
-        private double x_first_pick, y_first_pick;
-        private bool linha = false, circulo = false, quadrado = false, retangulo = false, click = false;
-
+        List<Produtos> produtos = new List<Produtos>();
+        private bool linha = false, circulo = false, quadrado = false, retangulo = false;
+        private double size = 10;
         Drawing_Canvas drawingCanvas = new Drawing_Canvas();
+        private List<StackPanel> binders = new List<StackPanel>(); // lista de quadrados
 
         public MainPage()
         {
@@ -47,18 +50,121 @@ namespace DesktopRA
 
             Thread t1 = new Thread(new ThreadStart(t1Async));
             t1.Start();
+            Thread t_produtos = new Thread(new ThreadStart(produtosAsync));
+            t_produtos.Start();
 
-            using (var client = new System.Net.WebClient())
+        }
+        public async void getImagesAsync(string url, StackPanel stackpanel)
+        {
+            Debug.WriteLine("INICIO GET IMAGEMS");
+            foreach (var art in produtos)
             {
-                var json = client.DownloadString("http://julianoblanco-001-site3.ctempurl.com/WebService/ProductList");
-                List<Product> list = JsonConvert.DeserializeObject<List<Product>>(json);
-
-                foreach (Product p in list)
+                try
                 {
-                    if (p.AR == true)
-                        produtos.Add(p);
+                    try
+                    {
+                        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            HttpStatusCode result = default(HttpStatusCode);
+                            var request = HttpWebRequest.Create(url + art.PictureMap);
+                            request.Method = "HEAD";
+                            using (var response = request.GetResponse() as HttpWebResponse)
+                            {
+                                if (response != null)
+                                {
+                                    result = response.StatusCode;
+                                    if(result == HttpStatusCode.OK)
+                                    {
+                                        Image image = new Image();
+                                        image.Source = new BitmapImage(
+                                    new Uri(url + art.PictureMap, UriKind.Absolute));
+                                        imagens.Add(image);
+                                        prod_list.Add(art);
+                                    }
+                                    response.Close();
+                                }
+                            }
+                                
+                        });
+                    }
+                    catch
+                    {
+                        Debug.WriteLine("IMAGEM ERRO");
+                    }
                 }
+                catch { Debug.WriteLine("ERROR"); }
             }
+
+            for(int l = 0; l < imagens.Count;l++)
+            {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    StackPanel panel = new StackPanel()
+                    {
+                        Name = "NumPad",
+                        Orientation = Orientation.Horizontal,
+                        Margin = new Thickness(5, 5, 5, 0),
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    };
+
+                    Windows.UI.Xaml.Controls.TextBlock label = new Windows.UI.Xaml.Controls.TextBlock()
+                    {
+                        Text = prod_list[l].Name,
+                        Margin = new Thickness(0, 40, 40, 0),
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    };
+                    Windows.UI.Xaml.Controls.Image image = new Windows.UI.Xaml.Controls.Image()
+                    {
+                        Source = imagens[l].Source,
+                        Height = 100,
+                        Width = 153,
+                        Stretch = Windows.UI.Xaml.Media.Stretch.Fill,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Margin = new Thickness(5, 5, 5, 5)
+                    };
+
+                    panel.Children.Add(image);
+                    panel.Children.Add(label);
+                    stackpanel.Children.Add(panel);
+
+                });
+            }
+        }
+        List<RALIBRARY.Produtos> prod_list = new List<Produtos>();
+        List<Image> imagens = new List<Image>();
+        private async void produtosAsync()
+        {
+            Objetos objetos = new Objetos();
+            produtos = await objetos.getListAsync();
+            getImagesAsync("http://julianoblanco-001-site3.ctempurl.com/Images/MapsAR/", Binder);
+        }
+
+        public async void AddImgtoCanvasAsync(Canvas canvas, Image image_)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                // abrir imagem
+                canvas.Children.Clear();
+
+                var bounds = Window.Current.Bounds;
+                double height = bounds.Height;
+                Debug.WriteLine(height);
+                double width = bounds.Width;
+                Debug.WriteLine(width);
+
+                Image image = new Image()
+                {
+                    Height = height,
+                    Width = width,
+                    Source = image_.Source
+
+                };
+                Canvas.SetLeft(image, 0);
+                Canvas.SetTop(image, 0);
+                canvas.Children.Add(image);
+            });
         }
 
         private async void t1Async()
@@ -67,7 +173,7 @@ namespace DesktopRA
             Socket listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listenSock.Bind(new IPEndPoint(IPAddress.Any, 1209));
             listenSock.Listen(2);
-
+            Objetos objetos = new Objetos();
             while (true)
             {
                 byte[] recebida = new byte[1024];
@@ -81,6 +187,18 @@ namespace DesktopRA
                         byte[] msg_send = Encoding.UTF8.GetBytes("hi");
                         newConnection.Send(msg_send);
                     }
+                    else
+                    {
+                        for(int i=0;i<prod_list.Count;i++)
+                        {
+                            if (("selectbyname_" + prod_list[i].Name).Equals(string_msg)){
+                                fullscreen = true;
+                                setFull(fullscreen);
+                                AddImgtoCanvasAsync(canvas,imagens[i]);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -92,7 +210,7 @@ namespace DesktopRA
 
         private void SizeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-
+            size = e.NewValue;
         }
 
         private void click_save(object sender, RoutedEventArgs e)
@@ -100,15 +218,13 @@ namespace DesktopRA
 
         }
 
-        private bool first_pick = false;
-
         private void canvas_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             if (!menu_click)
             {
                 if (quadrado)
                 {
-                    drawingCanvas.CreateSquare(canvas, e, 10);
+                    drawingCanvas.CreateSquare(canvas, e, size);
                 }
                 else if (retangulo)
                 {
@@ -116,10 +232,10 @@ namespace DesktopRA
                 }
                 else if (circulo)
                 {
-                    drawingCanvas.CreateCircle(canvas, e, 10);
+                    drawingCanvas.CreateCircle(canvas, e, size);
                 }else if (linha)
                 {
-                    drawingCanvas.CreateLine(canvas, 10, e);
+                    drawingCanvas.CreateLine(canvas, size, e);
                 }
             }
         }
@@ -128,8 +244,6 @@ namespace DesktopRA
         {
             
         }
-
-
 
         private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
         {
@@ -181,6 +295,32 @@ namespace DesktopRA
             circulo = false;
             retangulo = true; // true
         }
+        
+        private bool ferramentas = false;
+        private void MenuFlyoutItem_Click_5(object sender, RoutedEventArgs e)
+        {
+            ferramentas = !ferramentas;
+            if (!fullscreen)
+            {
+                var dialog = new MessageDialog("Coloque em tela cheia para desenhar");
+                SizeSlider.Visibility = Visibility.Collapsed;
+                TextBlockSlider.Visibility = Visibility.Collapsed;
+                dialog.ShowAsync();
+            }
+            else
+            {
+                if (ferramentas)
+                {
+                    SizeSlider.Visibility = Visibility.Visible;
+                    TextBlockSlider.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    SizeSlider.Visibility = Visibility.Collapsed;
+                    TextBlockSlider.Visibility = Visibility.Collapsed;
+                }
+            }
+            }
 
         private void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
         {
@@ -192,45 +332,52 @@ namespace DesktopRA
 
         private void click_clear(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
-
-        private void full_Screen(bool full)
+        private async void setFull(bool status)
         {
-
-            ApplicationView view = ApplicationView.GetForCurrentView();
-            Grid.SetRow(canvas, 0);
-            Grid.SetRowSpan(canvas, 10);
-
-            if (full)
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                view.TryEnterFullScreenMode();
-                Grid.SetColumn(canvas, 0);
-                Grid.SetColumnSpan(canvas, 10);
+                ApplicationView view = ApplicationView.GetForCurrentView();
                 Grid.SetRow(canvas, 0);
                 Grid.SetRowSpan(canvas, 10);
-                canvas.Margin = new Thickness(0, 0, 0, 0);
-                canvas_wid = canvas.Width;
-                canvas_heig = canvas.Height;
-            }
-            else
-            {
-                view.ExitFullScreenMode();
-                Grid.SetColumn(canvas, 4);
-                Grid.SetColumnSpan(canvas, 6);
-                Grid.SetRow(canvas, 0);
-                Grid.SetRowSpan(canvas, 9);
-                canvas.Margin = new Thickness(0, 25, 10, 30);
-                canvas.Width = canvas_wid;
-                canvas.Height = canvas_heig;
-            }
+                if (status)
+                {
+                    view.TryEnterFullScreenMode();
+                    Grid.SetColumn(canvas, 0);
+                    Grid.SetColumnSpan(canvas, 10);
+                    Grid.SetRow(canvas, 0);
+                    Grid.SetRowSpan(canvas, 10);
+                    canvas.Margin = new Thickness(0, 0, 0, 0);
+                    canvas_wid = canvas.Width;
+                    canvas_heig = canvas.Height;
+                }
+                else
+                {
+                    view.ExitFullScreenMode();
+                    Grid.SetColumn(canvas, 4);
+                    Grid.SetColumnSpan(canvas, 6);
+                    Grid.SetRow(canvas, 0);
+                    Grid.SetRowSpan(canvas, 9);
+                    canvas.Margin = new Thickness(0, 25, 10, 30);
+                    canvas.Width = canvas_wid;
+                    canvas.Height = canvas_heig;
+                }
+            });
         }
-
-        private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+ 
+        private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
+            if (fullscreen)
+            {
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    canvas.Children.Clear();
+                });
+            }
             fullscreen = !fullscreen;
-            full_Screen(fullscreen);
+            setFull(fullscreen);
         }
     }
 }

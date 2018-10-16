@@ -45,16 +45,9 @@
                 </StackPanel>
             </ScrollViewer>
         </Grid>
-        
-        <Canvas x:Name="canvas" Background="Black" Grid.Row="0" Grid.RowSpan="9" Grid.Column="4" Grid.ColumnSpan="6" Margin="0 30 10 30" PointerMoved="canvas_PointerMoved" PointerPressed="canvas_PointerPressed" PreviewKeyDown="canvas_PreviewKeyDown" KeyDown="canvas_KeyDown">
-            <Image x:Name="mapa_ra" Grid.ColumnSpan="10" Grid.Column="0" HorizontalAlignment="Left" Height="100" Margin="0,0,0,0" Grid.Row="0" Grid.RowSpan="10"/>
-            <Grid x:Name="GridFullScreen" Height="100" Canvas.Left="0">
-                <Slider Visibility="Collapsed" Width="100" Margin="0,75,580,0" x:Name="f_SizeSlider" Foreground="#FF3141A8" BorderBrush="{x:Null}" Background="#FF3141A8" Maximum="100" Minimum="10" TickFrequency="5" Value="3"  ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Grid.ColumnSpan="2"/>
-                <Button Visibility="Visible" Width="100" Margin="80,75,480,0" x:Name="f_undo" Content="Undo" Click="UndoButton_Click" Grid.Column="1"/>
-                <Button Visibility="Visible" Width="100" Margin="180,75,380,0" x:Name="f_save" Content="Save" Click="click_save" Grid.Column="1"/>
-                <Button Visibility="Visible" Width="100" Margin="280,75,280,0" x:Name="f_clear" Content="Clear" Click="click_clear" Grid.Column="1"/>
-            </Grid>
 
+        <Canvas x:Name="canvas" Background="Black" Grid.Row="0" Grid.RowSpan="10" Grid.Column="4" Grid.ColumnSpan="6" Margin="0 30 10 30" PointerMoved="canvas_PointerMoved" PointerPressed="canvas_PointerPressed" PreviewKeyDown="canvas_PreviewKeyDown" KeyDown="canvas_KeyDown">
+            <Image x:Name="mapa_ra" Grid.ColumnSpan="10" Grid.Column="0" HorizontalAlignment="Left" Height="100" Margin="0,0,0,0" Grid.Row="0" Grid.RowSpan="10"/>
             <Canvas.ContextFlyout>
                 <MenuFlyout Opened="MenuFlyout_Opened" Closed="MenuFlyout_Closed" Opening="MenuFlyout_Opening">
                     <MenuFlyoutItem Text="Linha" Click="MenuFlyoutItem_Click_1"/>
@@ -62,18 +55,15 @@
                     <MenuFlyoutItem Text="Quadrado" Click="MenuFlyoutItem_Click_2"/>
                     <MenuFlyoutItem Text="Retangulo" Click="MenuFlyoutItem_Click_3"/>
                     <MenuFlyoutItem Text="FullScreen" Click="MenuFlyoutItem_Click"/>
+                    <MenuFlyoutItem Text="Ferramentas Desenho" Click="MenuFlyoutItem_Click_5"/>
                     <MenuFlyoutItem Text="Salvar Imagem"/>
                 </MenuFlyout>
             </Canvas.ContextFlyout>
         </Canvas>
-        
-        <TextBlock Grid.Row="9" Grid.Column="5" Margin="0 18 0 0" Text="Color" ></TextBlock>
-        <ColorPicker x:Name="myColorPicker"
-             IsAlphaEnabled="True"/>
-        <Slider x:Name="SizeSlider" Foreground="#FF3141A8" BorderBrush="{x:Null}" Background="#FF3141A8" Maximum="100" Minimum="10" TickFrequency="5" Value="3"  ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Grid.Row="9" Grid.Column="6"  Margin="0 0 0 18"/>
-        <TextBlock Grid.Row="9" Grid.Column="6" Margin="10 18 0 0" Text="Size" ></TextBlock>
-        <Button Name="undo" Content="Undo" Grid.Column="4" Margin="10 5 5 10" Grid.Row="9" Click="UndoButton_Click"/>
+
+        <Slider x:Name="SizeSlider" Maximum="100" Minimum="10" Visibility="Collapsed" ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Background="White" Margin="0 50 0 0"/>
+        <TextBlock x:Name="TextBlockSlider" Margin="0 20 0 0" Visibility="Collapsed" ><Run Foreground="White">Size</Run></TextBlock>
         <Button x:Name="save" Content="Save" Visibility="Collapsed" Grid.Column="8" Grid.Row="9" Margin="10 5 5 10" Click="click_save"></Button>
-        <Button x:Name="clear" Content="Clear" Grid.Column="9" Grid.Row="9" Margin="10 5 5 10" Click="click_clear"></Button>
+        <TextBlock Grid.Column="4" HorizontalAlignment="Left" Margin="12,37,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="272"/>
     </Grid>
 </Page>
