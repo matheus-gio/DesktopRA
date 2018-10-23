@@ -48,22 +48,23 @@
 
         <Canvas x:Name="canvas" Background="Black" Grid.Row="0" Grid.RowSpan="10" Grid.Column="4" Grid.ColumnSpan="6" Margin="0 30 10 30" PointerMoved="canvas_PointerMoved" PointerPressed="canvas_PointerPressed" PreviewKeyDown="canvas_PreviewKeyDown" KeyDown="canvas_KeyDown">
             <Image x:Name="mapa_ra" Grid.ColumnSpan="10" Grid.Column="0" HorizontalAlignment="Left" Height="100" Margin="0,0,0,0" Grid.Row="0" Grid.RowSpan="10"/>
+            <ColorPicker x:Name="colorpicker" Canvas.Left="100" Canvas.Top="100" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Stretch" ColorChanged="colorpicker_ColorChanged"/>
+            <TextBlock x:Name="TextBlockSlider" Margin="0 20 0 0" Visibility="Collapsed" ><Run Foreground="White">Size</Run></TextBlock>
+            <Slider x:Name="SizeSlider" Maximum="100" Minimum="10" Canvas.Top="60" Canvas.Left="10" Visibility="Collapsed" ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Background="White" Margin="0,0,0,0" HorizontalAlignment="Stretch" Height="25" VerticalAlignment="Stretch" Width="260"/>
             <Canvas.ContextFlyout>
                 <MenuFlyout Opened="MenuFlyout_Opened" Closed="MenuFlyout_Closed" Opening="MenuFlyout_Opening">
                     <MenuFlyoutItem Text="Linha" Click="MenuFlyoutItem_Click_1"/>
                     <MenuFlyoutItem Text="Circulo" Click="MenuFlyoutItem_Click_4"/>
                     <MenuFlyoutItem Text="Quadrado" Click="MenuFlyoutItem_Click_2"/>
                     <MenuFlyoutItem Text="Retangulo" Click="MenuFlyoutItem_Click_3"/>
+                    <MenuFlyoutItem Text="Selecionar Cor" Click="MenuFlyoutItem_Click_6"/>
                     <MenuFlyoutItem Text="FullScreen" Click="MenuFlyoutItem_Click"/>
                     <MenuFlyoutItem Text="Ferramentas Desenho" Click="MenuFlyoutItem_Click_5"/>
-                    <MenuFlyoutItem Text="Salvar Imagem"/>
+                    <MenuFlyoutItem Text="Salvar Imagem" Click="MenuFlyoutItem_Click_8"/>
+                    <MenuFlyoutItem Text="Desfazer" Click="MenuFlyoutItem_Click_7"/>
                 </MenuFlyout>
             </Canvas.ContextFlyout>
         </Canvas>
 
-        <Slider x:Name="SizeSlider" Maximum="100" Minimum="10" Visibility="Collapsed" ValueChanged="SizeSlider_ValueChanged" SmallChange="1" Background="White" Margin="0 50 0 0"/>
-        <TextBlock x:Name="TextBlockSlider" Margin="0 20 0 0" Visibility="Collapsed" ><Run Foreground="White">Size</Run></TextBlock>
-        <Button x:Name="save" Content="Save" Visibility="Collapsed" Grid.Column="8" Grid.Row="9" Margin="10 5 5 10" Click="click_save"></Button>
-        <TextBlock Grid.Column="4" HorizontalAlignment="Left" Margin="12,37,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="272"/>
     </Grid>
 </Page>

@@ -136,7 +136,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="RALIBRARY, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="RALIBRARY, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\RALIBRARY\RALIBRARY\RALIBRARY\bin\x86\Debug\RALIBRARY.dll</HintPath>
     </Reference>

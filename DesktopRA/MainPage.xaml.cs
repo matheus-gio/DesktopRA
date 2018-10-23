@@ -39,10 +39,11 @@ namespace DesktopRA
 
         Boolean fullscreen = false; double canvas_heig,canvas_wid;
         List<Produtos> produtos = new List<Produtos>();
-        private bool linha = false, circulo = false, quadrado = false, retangulo = false;
+        private bool linha = false, circulo = false, quadrado = false, retangulo = false, color = false;
         private double size = 10;
         Drawing_Canvas drawingCanvas = new Drawing_Canvas();
         private List<StackPanel> binders = new List<StackPanel>(); // lista de quadrados
+        Windows.UI.Color cor = Colors.White;
 
         public MainPage()
         {
@@ -169,19 +170,23 @@ namespace DesktopRA
 
         private async void t1Async()
         {
-
+           
             Socket listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listenSock.Bind(new IPEndPoint(IPAddress.Any, 1209));
             listenSock.Listen(2);
             Objetos objetos = new Objetos();
+            Debug.WriteLine("OK");
             while (true)
             {
+                Debug.WriteLine("WHILE");
                 byte[] recebida = new byte[1024];
+        
                 using (Socket newConnection = listenSock.Accept())
                 {
+                    Debug.WriteLine("CONECT");
                     newConnection.Receive(recebida);
                     string string_msg = Encoding.UTF8.GetString(recebida).Substring(0, Encoding.UTF8.GetString(recebida).IndexOf("\0"));
-
+                    Debug.WriteLine("MSG");
                     if (string_msg.Equals("handshake"))
                     {
                         byte[] msg_send = Encoding.UTF8.GetBytes("hi");
@@ -224,18 +229,18 @@ namespace DesktopRA
             {
                 if (quadrado)
                 {
-                    drawingCanvas.CreateSquare(canvas, e, size);
+                    drawingCanvas.CreateSquare(canvas, e, size,cor);
                 }
                 else if (retangulo)
                 {
-                    drawingCanvas.Create_Rectangle(canvas, e);
+                    drawingCanvas.Create_Rectangle(canvas, e,cor);
                 }
                 else if (circulo)
                 {
-                    drawingCanvas.CreateCircle(canvas, e, size);
+                    drawingCanvas.CreateCircle(canvas, e, size,cor);
                 }else if (linha)
                 {
-                    drawingCanvas.CreateLine(canvas, size, e);
+                    drawingCanvas.CreateLine(canvas, size, e,cor);
                 }
             }
         }
@@ -322,6 +327,28 @@ namespace DesktopRA
             }
             }
 
+        private void colorpicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        {
+            cor = args.NewColor;
+        }
+
+        private void MenuFlyoutItem_Click_7(object sender, RoutedEventArgs e)
+        {
+            drawingCanvas.Undo_Draw(canvas);
+        }
+
+        private void MenuFlyoutItem_Click_8(object sender, RoutedEventArgs e)
+        {
+            drawingCanvas.CreateSaveBitmapAsync(canvas);
+        }
+
+        private void MenuFlyoutItem_Click_6(object sender, RoutedEventArgs e)
+        {
+            color = !color;
+            if (color) colorpicker.Visibility = Visibility.Visible;
+            else colorpicker.Visibility = Visibility.Collapsed;
+        }
+
         private void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
         {
             linha = false;
@@ -377,6 +404,7 @@ namespace DesktopRA
                 });
             }
             fullscreen = !fullscreen;
+            color = !color;
             setFull(fullscreen);
         }
     }
